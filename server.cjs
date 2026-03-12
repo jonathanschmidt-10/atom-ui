@@ -53,7 +53,51 @@ app.post("/api/evaluate", async (req, res) => {
     console.log(outputText || "(vacío)");
 
     const parsed = extractJsonFromText(outputText);
-    return res.json(parsed);
+
+const normalized = {
+  empresa: parsed.empresa || companyName || "",
+  industria: parsed.industria || parsed.sector || "Sin dato",
+  que_hace: parsed.descripcion || parsed.que_hace || "Sin dato",
+
+  score: parsed.score || parsed.score_icp_atom || "—",
+
+  clasificacion:
+    parsed.clasificacion ||
+    parsed.fit_icp_atom ||
+    "Sin dato",
+
+  prioridad_comercial:
+    parsed.prioridad_comercial ||
+    "Media",
+
+  pain_points_detectados:
+    parsed.pain_points_detectados ||
+    parsed.razones ||
+    ["Sin pain points detectados"],
+
+  justificacion_del_score:
+    parsed.justificacion_del_score ||
+    parsed.justificacion ||
+    "Sin justificación",
+
+  evidencia_positiva:
+    parsed.evidencia_positiva ||
+    ["Sin evidencia positiva"],
+
+  evidencia_negativa_o_dudas:
+    parsed.evidencia_negativa_o_dudas ||
+    ["Sin dudas detectadas"],
+
+  riesgos_del_analisis:
+    parsed.riesgos ||
+    ["Sin riesgos detectados"],
+
+  confianza_del_analisis:
+    parsed.confianza ||
+    "Media",
+};
+
+return res.json(normalized);
   } catch (err) {
     console.log("=== ERROR BACKEND ===");
     console.log(err);
