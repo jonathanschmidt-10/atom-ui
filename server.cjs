@@ -34,7 +34,26 @@ app.post("/api/evaluate", async (req, res) => {
       `Website: ${website || ""}.`,
       `País: ${country || ""}.`,
       `Descripción adicional: ${description || ""}.`,
-      "Devolvé solo JSON válido."
+      "Devolvé solo JSON válido, sin texto adicional.",
+      "Usá exactamente esta estructura:",
+      `{`,
+      `"empresa": "",`,
+      `"industria": "",`,
+      `"que_hace": "",`,
+      `"score": 0,`,
+      `"clasificacion": "",`,
+      `"prioridad_comercial": "",`,
+      `"pain_points_detectados": [],`,
+      `"justificacion_del_score": "",`,
+      `"evidencia_positiva": [],`,
+      `"evidencia_negativa_o_dudas": [],`,
+      `"riesgos_del_analisis": [],`,
+      `"que_inflo_el_analisis": [],`,
+      `"que_bajo_el_analisis": [],`,
+      `"confianza_del_analisis": "",`,
+      `"faltantes_por_validar": [],`,
+      `"urls_recomendadas_para_investigar": []`,
+      `}`,
     ].join(" ");
 
     console.log("\n=== REQUEST RECIBIDO ===");
@@ -54,135 +73,81 @@ app.post("/api/evaluate", async (req, res) => {
 
     const parsed = extractJsonFromText(outputText);
 
-const normalized = {
-  empresa: parsed.empresa || companyName || "",
-  industria:
-    parsed.industria ||
-    parsed.sector ||
-    parsed.vertical ||
-    "Sin dato",
+    const normalized = {
+      empresa: parsed.empresa || companyName || "",
+      industria:
+        parsed.industria ||
+        parsed.sector ||
+        parsed.vertical ||
+        "Sin dato",
+      que_hace:
+        parsed.que_hace ||
+        parsed.descripcion ||
+        parsed.resumen ||
+        parsed.motivo_principal ||
+        "Sin dato",
+      score:
+        parsed.score ||
+        parsed.score_icp_atom ||
+        parsed.score_icp ||
+        "—",
+      clasificacion:
+        parsed.clasificacion ||
+        parsed.fit_icp_atom ||
+        parsed.veredicto_icp ||
+        "Sin dato",
+      prioridad_comercial:
+        parsed.prioridad_comercial ||
+        parsed.prioridad ||
+        "Media",
+      pain_points_detectados:
+        parsed.pain_points_detectados ||
+        parsed.pains_detectados ||
+        parsed.pain_points ||
+        parsed.razones ||
+        ["Sin pain points detectados"],
+      justificacion_del_score:
+        parsed.justificacion_del_score ||
+        parsed.justificacion ||
+        parsed.motivo_principal ||
+        "Sin justificación",
+      evidencia_positiva:
+        parsed.evidencia_positiva ||
+        parsed.senales_positivas ||
+        ["Sin evidencia positiva"],
+      evidencia_negativa_o_dudas:
+        parsed.evidencia_negativa_o_dudas ||
+        parsed.senales_negativas ||
+        parsed.senales_negativas_o_riesgos ||
+        parsed.riesgos_o_dudas ||
+        ["Sin dudas detectadas"],
+      riesgos_del_analisis:
+        parsed.riesgos_del_analisis ||
+        parsed.riesgos ||
+        ["Sin riesgos detectados"],
+      que_inflo_el_analisis:
+        parsed.que_inflo_el_analisis ||
+        parsed.factores_positivos ||
+        parsed.senales_positivas ||
+        ["Sin factores que inflaron el análisis"],
+      que_bajo_el_analisis:
+        parsed.que_bajo_el_analisis ||
+        parsed.factores_negativos ||
+        parsed.senales_negativas ||
+        ["Sin factores que bajaron el análisis"],
+      confianza_del_analisis:
+        parsed.confianza_del_analisis ||
+        parsed.confianza ||
+        "Media",
+      faltantes_por_validar:
+        parsed.faltantes_por_validar ||
+        ["Sin faltantes por validar"],
+      urls_recomendadas_para_investigar:
+        parsed.urls_recomendadas_para_investigar ||
+        ["Sin URLs recomendadas"],
+    };
 
-  que_hace:
-    parsed.que_hace ||
-    parsed.descripcion ||
-    parsed.resumen ||
-    parsed.motivo_principal ||
-    "Sin dato",
-
-  score:
-    parsed.score ||
-    parsed.score_icp_atom ||
-    parsed.score_icp ||
-    "—",
-
-  clasificacion:
-    parsed.clasificacion ||
-    parsed.fit_icp_atom ||
-    parsed.veredicto_icp ||
-    "Sin dato",
-
-  prioridad_comercial:
-    parsed.prioridad_comercial ||
-    parsed.prioridad ||
-    "Media",
-
-  pain_points_detectados:
-    parsed.pain_points_detectados ||
-    parsed.pains_detectados ||
-    parsed.pain_points ||
-    parsed.razones ||
-    ["Sin pain points detectados"],
-
-  justificacion_del_score:
-    parsed.justificacion_del_score ||
-    parsed.justificacion ||
-    parsed.motivo_principal ||
-    "Sin justificación",
-
-  evidencia_positiva:
-    parsed.evidencia_positiva ||
-    parsed.senales_positivas ||
-    ["Sin evidencia positiva"],
-
-  evidencia_negativa_o_dudas:
-    parsed.evidencia_negativa_o_dudas ||
-    parsed.senales_negativas ||
-    parsed.senales_negativas_o_riesgos ||
-    parsed.riesgos_o_dudas ||
-    ["Sin dudas detectadas"],
-
-  riesgos_del_analisis:
-    parsed.riesgos_del_analisis ||
-    parsed.riesgos ||
-    ["Sin riesgos detectados"],
-
-  que_inflo_el_analisis:
-    parsed.que_inflo_el_analisis ||
-    parsed.factores_positivos ||
-    parsed.senales_positivas ||
-    ["Sin factores que inflaron el análisis"],
-
-  que_bajo_el_analisis:
-    parsed.que_bajo_el_analisis ||
-    parsed.factores_negativos ||
-    parsed.senales_negativas ||
-    ["Sin factores que bajaron el análisis"],
-
-  confianza_del_analisis:
-    parsed.confianza_del_analisis ||
-    parsed.confianza ||
-    "Media",
-
-  faltantes_por_validar:
-    parsed.faltantes_por_validar ||
-    ["Sin faltantes por validar"],
-
-  urls_recomendadas_para_investigar:
-    parsed.urls_recomendadas_para_investigar ||
-    ["Sin URLs recomendadas"],
-};
-
-return res.json(normalized);
-
-  score: parsed.score || parsed.score_icp_atom || "—",
-
-  clasificacion:
-    parsed.clasificacion ||
-    parsed.fit_icp_atom ||
-    "Sin dato",
-
-  prioridad_comercial:
-    parsed.prioridad_comercial ||
-    "Media",
-
-  pain_points_detectados:
-    parsed.pain_points_detectados ||
-    parsed.razones ||
-    ["Sin pain points detectados"],
-
-  justificacion_del_score:
-    parsed.justificacion_del_score ||
-    parsed.justificacion ||
-    "Sin justificación",
-
-  evidencia_positiva:
-    parsed.evidencia_positiva ||
-    ["Sin evidencia positiva"],
-
-  evidencia_negativa_o_dudas:
-    parsed.evidencia_negativa_o_dudas ||
-    ["Sin dudas detectadas"],
-
-  riesgos_del_analisis:
-    parsed.riesgos ||
-    ["Sin riesgos detectados"],
-
-  confianza_del_analisis:
-    parsed.confianza ||
-    "Media",
-};
-
-return res.json(normalized);
+    return res.json(normalized);
   } catch (err) {
     console.log("=== ERROR BACKEND ===");
     console.log(err);
