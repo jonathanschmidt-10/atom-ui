@@ -43,7 +43,7 @@ app.post("/api/evaluate", async (req, res) => {
     console.log(prompt);
 
     const response = await client.responses.create({
-      model: "gpt-5.4",
+      model: "gpt-4.1-mini",
       input: prompt,
     });
 
@@ -56,8 +56,93 @@ app.post("/api/evaluate", async (req, res) => {
 
 const normalized = {
   empresa: parsed.empresa || companyName || "",
-  industria: parsed.industria || parsed.sector || "Sin dato",
-  que_hace: parsed.descripcion || parsed.que_hace || "Sin dato",
+  industria:
+    parsed.industria ||
+    parsed.sector ||
+    parsed.vertical ||
+    "Sin dato",
+
+  que_hace:
+    parsed.que_hace ||
+    parsed.descripcion ||
+    parsed.resumen ||
+    parsed.motivo_principal ||
+    "Sin dato",
+
+  score:
+    parsed.score ||
+    parsed.score_icp_atom ||
+    parsed.score_icp ||
+    "—",
+
+  clasificacion:
+    parsed.clasificacion ||
+    parsed.fit_icp_atom ||
+    parsed.veredicto_icp ||
+    "Sin dato",
+
+  prioridad_comercial:
+    parsed.prioridad_comercial ||
+    parsed.prioridad ||
+    "Media",
+
+  pain_points_detectados:
+    parsed.pain_points_detectados ||
+    parsed.pains_detectados ||
+    parsed.pain_points ||
+    parsed.razones ||
+    ["Sin pain points detectados"],
+
+  justificacion_del_score:
+    parsed.justificacion_del_score ||
+    parsed.justificacion ||
+    parsed.motivo_principal ||
+    "Sin justificación",
+
+  evidencia_positiva:
+    parsed.evidencia_positiva ||
+    parsed.senales_positivas ||
+    ["Sin evidencia positiva"],
+
+  evidencia_negativa_o_dudas:
+    parsed.evidencia_negativa_o_dudas ||
+    parsed.senales_negativas ||
+    parsed.senales_negativas_o_riesgos ||
+    parsed.riesgos_o_dudas ||
+    ["Sin dudas detectadas"],
+
+  riesgos_del_analisis:
+    parsed.riesgos_del_analisis ||
+    parsed.riesgos ||
+    ["Sin riesgos detectados"],
+
+  que_inflo_el_analisis:
+    parsed.que_inflo_el_analisis ||
+    parsed.factores_positivos ||
+    parsed.senales_positivas ||
+    ["Sin factores que inflaron el análisis"],
+
+  que_bajo_el_analisis:
+    parsed.que_bajo_el_analisis ||
+    parsed.factores_negativos ||
+    parsed.senales_negativas ||
+    ["Sin factores que bajaron el análisis"],
+
+  confianza_del_analisis:
+    parsed.confianza_del_analisis ||
+    parsed.confianza ||
+    "Media",
+
+  faltantes_por_validar:
+    parsed.faltantes_por_validar ||
+    ["Sin faltantes por validar"],
+
+  urls_recomendadas_para_investigar:
+    parsed.urls_recomendadas_para_investigar ||
+    ["Sin URLs recomendadas"],
+};
+
+return res.json(normalized);
 
   score: parsed.score || parsed.score_icp_atom || "—",
 
