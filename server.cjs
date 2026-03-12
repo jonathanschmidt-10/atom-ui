@@ -38,18 +38,18 @@ app.post("/api/evaluate", (req, res) => {
   console.log(prompt);
 
   const child = spawn(
-    "openclaw",
-    [
-      "agent",
-      "--agent",
-      "qualifier",
-      "--message",
-      prompt
-    ],
-    {
-      shell: false
-    }
-  );
+  "openclaw",
+  [
+    "agent",
+    "--agent",
+    "qualifier",
+    "--message",
+    prompt
+  ],
+  {
+    shell: false
+  }
+);
 
   let stdout = "";
   let stderr = "";
