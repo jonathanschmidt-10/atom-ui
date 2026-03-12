@@ -3,7 +3,7 @@ const cors = require("cors");
 const { spawn } = require("child_process");
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -38,10 +38,8 @@ app.post("/api/evaluate", (req, res) => {
   console.log(prompt);
 
   const child = spawn(
-    "cmd.exe",
+    "openclaw",
     [
-      "/c",
-      "openclaw",
       "agent",
       "--agent",
       "qualifier",
@@ -49,7 +47,7 @@ app.post("/api/evaluate", (req, res) => {
       prompt
     ],
     {
-      windowsHide: true
+      shell: false
     }
   );
 
@@ -62,6 +60,16 @@ app.post("/api/evaluate", (req, res) => {
 
   child.stderr.on("data", (data) => {
     stderr += data.toString();
+  });
+
+  child.on("error", (err) => {
+    console.log("=== CHILD PROCESS ERROR ===");
+    console.log(err);
+
+    return res.status(500).json({
+      error: "No pude ejecutar OpenClaw.",
+      details: err.message,
+    });
   });
 
   child.on("close", (code) => {
@@ -96,6 +104,10 @@ app.get("/api/ping", (_req, res) => {
   res.json({ ok: true, message: "backend vivo" });
 });
 
+app.get("/", (_req, res) => {
+  res.send("atom api online");
+});
+
 app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor backend corriendo en puerto ${PORT}`);
 });
